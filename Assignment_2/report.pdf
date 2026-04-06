@@ -1,0 +1,92 @@
+CSCI 611 Assignment 2 Report
+
+Introduction
+
+For this assignment, I worked on two parts related to computer vision. In Part 1, I completed the image filtering notebook by filling in the TODO sections and applying different blur and edge detection filters to images. In Part 2, I built my own convolutional neural network in PyTorch and used it to classify CIFAR-10 images. Doing both parts helped me understand the connection between basic image filtering and how CNNs learn useful image features.
+
+Part 1 Image Filtering
+
+In Part 1, I kept the original notebook structure and only filled in the TODO sections. I loaded the image, converted it to grayscale, and then used cv2.filter2D() to apply custom kernels.
+
+For the blur section, I used 2x2, 3x3, and 5x5 averaging kernels. The 2x2 blur only smoothed the image a little, while the 3x3 and 5x5 filters made the image look more blurred. As the kernel size increased, the image became smoother, but it also lost more detail. This matched what I expected because a larger averaging filter smooths out more local variation.
+
+For the edge detection section, I applied horizontal, vertical, and diagonal kernels. Each one responded to intensity changes in a different direction. The horizontal and vertical filters highlighted strong edges based on orientation, and the diagonal filters picked up slanted boundaries and corner-like details. This made it clear that the kernel shape affects what features are emphasized in the output.
+
+I also ran an extra experiment using a second image called animal-eye-staring-close-up-watch-nature-generative-ai.jpg. For that image, I showed the original image, grayscale version, blur results, edge detection results, diagonal filters, blur followed by edge detection, and downsampling. Using a second image made it easier to see how the same filters can behave differently depending on image content.
+
+One thing I noticed in Part 1 was that applying blur before edge detection sometimes reduced noise and made stronger edges easier to see. At the same time, too much blur removed useful detail, so there was a tradeoff between smoothing and preserving structure.
+
+Part 1 Challenges
+
+The main issue I had in Part 1 was with the notebook after restarting the kernel. I kept getting errors like np not defined, gray not defined, and cv2 not defined. The fix was to rerun the setup cells in order so that all the imports and image variables were recreated before running the filtering cells again.
+
+I also had trouble getting OpenCV to work in GitHub Codespaces. The actual fix was installing the missing Linux packages in the Codespaces terminal. After that, import cv2 worked and cv2.version showed 4.13.0. Once that was fixed, the filtering notebook worked normally.
+
+Part 2 CNN Implementation
+
+In Part 2, I built my own convolutional neural network in PyTorch for CIFAR-10 classification. I used convolution layers, max pooling, linear layers, dropout, and ReLU activations. The input images in CIFAR-10 are 32 by 32 RGB images, so the network took in 3 by 32 by 32 tensors.
+
+The first CNN I completed used three convolution layers followed by max pooling, then two fully connected layers at the end. The structure was a convolution from 3 to 16, then from 16 to 32, then from 32 to 64, with max pooling after each stage. After flattening the final feature maps, I used a fully connected layer from 1024 to 128, then a final output layer from 128 to 10. I also added dropout to help reduce overfitting.
+
+Because the input images start at 32 by 32, the three pooling layers reduced the spatial size from 32 by 32 to 16 by 16, then 8 by 8, then 4 by 4. With 64 channels after the third convolution layer, that gave a flattened size of 64 times 4 times 4, which is 1024. That is why the fully connected layer used 1024 input features.
+
+For training, I used cross entropy loss and the SGD optimizer. One thing I learned while doing this part was that changing the optimizer line by itself does not change anything unless I rerun training from scratch with a fresh model.
+
+My CNN architecture can be summarized like this:
+
+Input image 3 by 32 by 32
+
+Convolution from 3 to 16 with ReLU
+Max pooling
+
+Convolution from 16 to 32 with ReLU
+Max pooling
+
+Convolution from 32 to 64 with ReLU
+Max pooling
+
+Flatten to 1024 features
+
+Fully connected layer from 1024 to 128 with ReLU and dropout
+
+Final output layer from 128 to 10
+
+Results
+
+My completed CNN got a test loss of 1.012638 and an overall test accuracy of 65.1 percent on CIFAR-10, which was 6510 correct predictions out of 10000 test images.
+
+The class accuracies were:
+
+Airplane 65 percent
+Automobile 80 percent
+Bird 35 percent
+Cat 42 percent
+Deer 57 percent
+Dog 58 percent
+Frog 90 percent
+Horse 63 percent
+Ship 76 percent
+Truck 81 percent
+
+These results show that my model did well on classes like frog, truck, automobile, and ship, but it struggled more on bird and cat. That makes sense because some CIFAR-10 categories are harder to separate, especially when the images are small and some classes look visually similar.
+
+The total number of trainable parameters in my model was 620810.
+
+I also built a stronger second CNN with more channels, batch normalization, dropout, and Adam because I wanted to push my accuracy above 70 percent. That architecture was stronger, but training was too slow in my Codespaces environment because CUDA was not available and everything had to run on CPU. Even though I did not finish that longer run, it still helped me understand how model size, optimizer choice, and compute resources affect performance.
+
+What Helped
+
+A few things helped me a lot on this assignment. In Part 1, keeping the original notebook structure made it easier to stay aligned with the assignment and only complete the required TODO sections. Testing the filters on a second image also helped me understand the results better instead of only looking at one example.
+
+In Part 2, using multiple convolution layers helped my network learn more useful image features. Max pooling reduced the image size through the network and made the model more manageable. Dropout helped with regularization, and ReLU worked well as the hidden layer activation. Fixing the OpenCV issue in Codespaces was also important because once that was solved, I could move through Part 1 without being blocked by environment errors.
+
+What Did Not Help and Challenges
+
+Some things either did not help much or caused extra difficulty. In Part 1, larger blur kernels removed too much detail, so while they smoothed the image more, they also made important features less visible. Some of the edge filters also picked up texture and noise instead of only strong object boundaries.
+
+In Part 2, one confusing part was thinking that switching from SGD to Adam should immediately show something, when in reality the model had to be retrained before any difference would appear. Another issue was that CUDA was not available in my Codespaces environment, so training had to run on CPU. That made the stronger CNN take much longer than I expected. I also ran into notebook issues after restarting the kernel, since variables from earlier cells had to be recreated before later cells would work again.
+
+Conclusion
+
+Overall, this assignment helped me understand both manual image filtering and CNN based image classification better. In Part 1, I directly applied blur and edge detection kernels and saw how different filters changed the image. In Part 2, I built my own CNN and used it to learn image features automatically from CIFAR-10. My final completed model reached 65.1 percent test accuracy with 620810 trainable parameters using SGD. I also started testing a stronger version to improve performance further. Even without fully finishing that second run, I still learned a lot about how architecture choices, optimizer choice, and training environment affect CNN results.
+
