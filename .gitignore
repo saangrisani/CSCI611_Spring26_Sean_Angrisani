@@ -1,0 +1,7 @@
+
+# datasets / generated artifacts
+Assignment_2/build_cnn/data/
+*.tar.gz
+
+# virtualenv
+.venv/
